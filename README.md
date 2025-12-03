@@ -44,7 +44,7 @@ Using a 15-minute timecode system as illustrated above means that we "lock" a un
 ![image3](https://montydimkpa-fyi-public.sfo3.cdn.digitaloceanspaces.com/media/articles/payment-idempotency/payment-image-3.png)
 
 
-In our hashing scheme, we separately generate hashes for the sender and receiver side based on their respective required components and join both hashes by a delimeter, which can simply be a period.
+In our hashing scheme, we separately generate hashes for the sender and receiver sides based on their respective required components and join both hashes by a delimeter, which can simply be a period.
 
 You can see code for generating this key on [Github](https://github.com/montyd1905/mds-blog-idempotent-payments/blob/main/idempotency_key.py).
 
@@ -57,7 +57,11 @@ You can see code for generating this key on [Github](https://github.com/montyd19
 
 - Secondly, we reduce security risks by generating the IK from the payload and internal business logic (which includes validations; so it is much harder to fake). Compare this with a simple random UUID which an attacker can simply fake and add to the header to con the system into processing a fake transaction.
 
-- Finally, our "time lock" system removes the need for additional downstream TTL checks by effectively baking the TTL into the IK upstream at the request preprocessing stage (if a new transaction is detected as a duplicate within the given time interval, the resulting key is not unique and the transaction is simply ignored downstream). This improves reliability and performance.
+- Finally, our "time lock" system removes the need for additional downstream TTL checks by effectively baking the TTL into the IK upstream at the request preprocessing stage (if a new transaction is detected as a duplicate within the given time interval, the resulting key is not unique and the transaction is simply ignored downstream). 
+  - This improves reliability and performance.
 
+## Examples
+
+You can find examples on [Github](https://github.com/montyd1905/mds-blog-idempotent-payments/blob/main/example_usage.py).
 
 
