@@ -44,17 +44,20 @@ Using a 15-minute timecode system as illustrated above means that we "lock" a un
 ![image3](https://montydimkpa-fyi-public.sfo3.cdn.digitaloceanspaces.com/media/articles/payment-idempotency/payment-image-3.png)
 
 
+In our hashing scheme, we separately generate hashes for the sender and receiver side based on their respective required components and join both hashes by a delimeter, which can simply be a period.
 
+You can see code for generating this key on [Github](https://github.com/montyd1905/mds-blog-idempotent-payments/blob/main/idempotency_key.py).
 
 
 ## Advantages: Improved Security, Performance & Reliability
 
 ![image4](https://montydimkpa-fyi-public.sfo3.cdn.digitaloceanspaces.com/media/articles/payment-idempotency/payment-image-4.png)
 
+- As you can see, our goal is to create an idempotency key (IK) that is based on the actual transaction, instead of just a unique random key that forces us to compare transaction details in some expensive downstream validation. This amounts to a more performant implementation.
 
-As you can see, our goal is to create an idempotency key (IK) that is based on the actual transaction, instead of just a unique random key that forces us to compare transaction details in some expensive downstream validation.
+- Secondly, we reduce security risks by generating the IK from the payload and internal business logic (which includes validations; so it is much harder to fake). Compare this with a simple random UUID which an attacker can simply fake and add to the header to con the system into processing a fake transaction.
 
-Also, we reduce security risks by generating the IK from the payload and internal business logic (which includes validations; so it is much harder to fake).
+- Finally, our "time lock" system removes the need for additional downstream TTL checks by effectively baking the TTL into the IK upstream at the request preprocessing stage (if a new transaction is detected as a duplicate within the given time interval, the resulting key is not unique and the transaction is simply ignored downstream). This improves reliability and performance.
 
-Finally, our "time lock" system removes the need for additional downstream TTL checks by effectively baking the TTL into the IK upstream at the request preprocessing stage (if a new transaction is detected as a duplicate within the given time interval, the resulting key is not unique and the transaction is simply ignored downstream).
+
 
